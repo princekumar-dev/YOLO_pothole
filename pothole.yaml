@@ -1,0 +1,9 @@
+path: .  # dataset root is this folder
+
+# For now we'll use all images in ./images for both train and val.
+# Later you can create separate folders if you want a real split.
+train: images
+val: images
+
+names:
+  0: pothole

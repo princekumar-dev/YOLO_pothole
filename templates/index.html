@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PotholeAI — Real-Time Pothole Detection</title>
+  <meta name="description" content="Real-time pothole detection using AI and your camera." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">⚠️</div>
+        <span class="logo-text">Pothole<span class="logo-accent">AI</span></span>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-live" id="statusBadge">
+          <span class="pulse-dot"></span>
+          Connecting…
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- Video Section -->
+    <div class="video-wrapper">
+      <div class="video-container" id="videoContainer">
+        <!-- Hidden video element for camera feed -->
+        <video id="video" autoplay playsinline muted></video>
+        <!-- Canvas overlay for detections -->
+        <canvas id="canvas"></canvas>
+        <!-- Start screen -->
+        <div class="start-screen" id="startScreen">
+          <div class="start-icon">📷</div>
+          <p class="start-title">Camera Access Required</p>
+          <p class="start-sub">Click below to start real-time pothole detection</p>
+          <button class="btn-start" id="startBtn">Start Detection</button>
+        </div>
+        <!-- Corner overlays for style -->
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+        <!-- HUD overlay -->
+        <div class="hud" id="hud" style="display:none;">
+          <button class="btn-switch-cam" id="switchCamBtn" title="Switch Camera">↻</button>
+          <div class="hud-item">
+            <span class="hud-label">FPS</span>
+            <span class="hud-value" id="fpsVal">0</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label">Detected</span>
+            <span class="hud-value" id="detCount">0</span>
+          </div>
+          <div class="hud-item">
+            <span class="hud-label">Status</span>
+            <span class="hud-value" id="modelStatus">Loading</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Panel -->
+    <div class="stats-panel">
+      <div class="stat-card">
+        <div class="stat-icon">🕳️</div>
+        <div class="stat-info">
+          <div class="stat-value" id="totalDetections">0</div>
+          <div class="stat-label">Total Detections</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🎯</div>
+        <div class="stat-info">
+          <div class="stat-value" id="avgConf">—</div>
+          <div class="stat-label">Avg. Confidence</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-info">
+          <div class="stat-value" id="liveFPS">0</div>
+          <div class="stat-label">Live FPS</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📡</div>
+        <div class="stat-info">
+          <div class="stat-value" id="connStatus">—</div>
+          <div class="stat-label">Connection</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detection Log -->
+    <div class="log-section">
+      <div class="log-header">
+        <span>🔍 Detection Log</span>
+        <button class="btn-clear" id="clearLog">Clear</button>
+      </div>
+      <div class="log-body" id="logBody">
+        <div class="log-empty">No detections yet. Start the camera to begin.</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Socket.IO + App JS -->
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+
+</html>
