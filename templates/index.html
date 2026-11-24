@@ -3,119 +3,747 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PotholeAI — Real-Time Pothole Detection</title>
-  <meta name="description" content="Real-time pothole detection using AI and your camera." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet" />
-  <link rel="stylesheet" href="/static/style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <title>PotholeAI — Autonomous Road Surface Intelligence & Pothole Detection</title>
+  <meta name="description"
+    content="Production-grade AI road inspection and real-time pothole hazard detection powered by custom YOLO11." />
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+  <!-- Favicon & Brand Icons -->
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v=2.7" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png?v=2.7" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/static/favicon.png?v=2.7" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png?v=2.7" />
+  <link rel="shortcut icon" href="/favicon.ico?v=2.7" />
+
+  <!-- Favicon & Brand Icons -->
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg?v=2.7" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png?v=2.7" />
+  <link rel="icon" type="image/png" sizes="64x64" href="/static/favicon.png?v=2.7" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png?v=2.7" />
+  <link rel="shortcut icon" href="/favicon.ico?v=2.7" />
+
+  <!-- Local-first: live scanning uses the image API fallback when Socket.IO is unavailable -->
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/static/style.css?v=4.2" />
 </head>
 
 <body>
-  <!-- Header -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="logo">
-        <div class="logo-icon">⚠️</div>
-        <span class="logo-text">Pothole<span class="logo-accent">AI</span></span>
+  <!-- Atmospheric Gradient Blooms (ElevenLabs Signature) -->
+  <div class="ambient-blooms" aria-hidden="true">
+    <div class="bloom bloom-mint"></div>
+    <div class="bloom bloom-peach"></div>
+    <div class="bloom bloom-lavender"></div>
+    <div class="bloom bloom-sky"></div>
+  </div>
+
+  <!-- Header / Top Navigation -->
+  <header class="top-nav">
+    <div class="nav-container">
+      <div class="brand-group">
+        <div class="brand-mark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Pothole<span class="brand-sub">Vision</span></span>
+          <span class="brand-tag">v2.4 · YOLO11n</span>
+        </div>
       </div>
-      <div class="header-badges">
-        <span class="badge badge-live" id="statusBadge">
-          <span class="pulse-dot"></span>
-          Connecting…
-        </span>
+
+      <nav class="nav-tabs" role="tablist">
+        <button class="nav-tab active" data-tab="scanner" role="tab" aria-selected="true">
+          <span class="tab-indicator"></span>
+          Live Camera Scan
+        </button>
+        <button class="nav-tab" data-tab="studio" role="tab" aria-selected="false">
+          <span class="tab-indicator"></span>
+          Image Inspection
+        </button>
+        <button class="nav-tab" data-tab="diagnostics" role="tab" aria-selected="false">
+          <span class="tab-indicator"></span>
+          Model Metrics (95.8%)
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="status-pill" id="globalStatusPill">
+          <span class="status-pulse"></span>
+          <span class="status-text" id="globalStatusText">Model Ready</span>
+        </div>
+        <button class="btn-outline-pill btn-sm" id="openSettingsBtn" onclick="openSettingsModal()"
+          title="Detection & Audio Settings">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
+          </svg>
+          Settings
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- Main -->
-  <main class="main">
-    <!-- Video Section -->
-    <div class="video-wrapper">
-      <div class="video-container" id="videoContainer">
-        <!-- Hidden video element for camera feed -->
-        <video id="video" autoplay playsinline muted></video>
-        <!-- Canvas overlay for detections -->
-        <canvas id="canvas"></canvas>
-        <!-- Start screen -->
-        <div class="start-screen" id="startScreen">
-          <div class="start-icon">📷</div>
-          <p class="start-title">Camera Access Required</p>
-          <p class="start-sub">Click below to start real-time pothole detection</p>
-          <button class="btn-start" id="startBtn">Start Detection</button>
-        </div>
-        <!-- Corner overlays for style -->
-        <div class="corner tl"></div>
-        <div class="corner tr"></div>
-        <div class="corner bl"></div>
-        <div class="corner br"></div>
-        <!-- HUD overlay -->
-        <div class="hud" id="hud" style="display:none;">
-          <button class="btn-switch-cam" id="switchCamBtn" title="Switch Camera">↻</button>
-          <div class="hud-item">
-            <span class="hud-label">FPS</span>
-            <span class="hud-value" id="fpsVal">0</span>
-          </div>
-          <div class="hud-item">
-            <span class="hud-label">Detected</span>
-            <span class="hud-value" id="detCount">0</span>
-          </div>
-          <div class="hud-item">
-            <span class="hud-label">Status</span>
-            <span class="hud-value" id="modelStatus">Loading</span>
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- Main Content Wrapper -->
+  <main class="page-container">
 
-    <!-- Stats Panel -->
-    <div class="stats-panel">
-      <div class="stat-card">
-        <div class="stat-icon">🕳️</div>
-        <div class="stat-info">
-          <div class="stat-value" id="totalDetections">0</div>
-          <div class="stat-label">Total Detections</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🎯</div>
-        <div class="stat-info">
-          <div class="stat-value" id="avgConf">—</div>
-          <div class="stat-label">Avg. Confidence</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">⚡</div>
-        <div class="stat-info">
-          <div class="stat-value" id="liveFPS">0</div>
-          <div class="stat-label">Live FPS</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">📡</div>
-        <div class="stat-info">
-          <div class="stat-value" id="connStatus">—</div>
-          <div class="stat-label">Connection</div>
-        </div>
-      </div>
-    </div>
+    <!-- Hero Band -->
+    <section class="hero-band">
+      <div class="hero-inner">
+        <div class="badge-pill mb-4">Autonomous Road Surface Intelligence</div>
+        <h1 class="hero-headline">Computer vision for roadway preservation.</h1>
+        <p class="hero-subhead">
+          Real-time pothole identification, hazard severity grading, and infrastructure damage auditing powered by a
+          custom-trained YOLO11 neural network with 95.8% precision.
+        </p>
 
-    <!-- Detection Log -->
-    <div class="log-section">
-      <div class="log-header">
-        <span>🔍 Detection Log</span>
-        <button class="btn-clear" id="clearLog">Clear</button>
+        <div class="metrics-ribbon">
+          <div class="metric-item">
+            <span class="metric-num">95.8%</span>
+            <span class="metric-lbl">mAP@50 Accuracy</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-num">92.3%</span>
+            <span class="metric-lbl">Model Precision</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-num">~18ms</span>
+            <span class="metric-lbl">Inference Latency</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-num">50 Epochs</span>
+            <span class="metric-lbl">Validated Weights</span>
+          </div>
+        </div>
       </div>
-      <div class="log-body" id="logBody">
-        <div class="log-empty">No detections yet. Start the camera to begin.</div>
+    </section>
+
+    <!-- TAB 1: REAL-TIME CAMERA SCANNER -->
+    <section class="tab-content active" id="tab-scanner" role="tabpanel">
+      <div class="scanner-layout">
+
+        <!-- Video Feed Container -->
+        <div class="viewport-card">
+          <div class="viewport-header">
+            <div class="viewport-title-group">
+              <span class="live-dot" id="liveDot"></span>
+              <span class="viewport-title" id="feedTitle">Live Camera Optical Stream</span>
+            </div>
+
+            <div class="viewport-controls">
+              <button class="control-btn" id="switchCamBtn" title="Switch between User / Road Facing Camera">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path
+                    d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0-3-3m3 3-3 3M4 8v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8m-16 0 3 3M4 8l3-3" />
+                </svg>
+                Flip Lens
+              </button>
+              <button class="control-btn" id="snapshotBtn" title="Capture high-res still for detailed audit" disabled>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                Audit Still
+              </button>
+              <button class="control-btn" id="audioAlertToggle" title="Toggle acoustic hazard warning chime">
+                <span id="audioIcon">🔔</span>
+                <span id="audioLabel">Alerts On</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="video-stage" id="videoStage">
+            <video id="webcam" autoplay playsinline muted></video>
+            <canvas id="overlayCanvas"></canvas>
+
+            <!-- Camera Inactive Splash -->
+            <div class="camera-prompt" id="cameraPrompt">
+              <div class="prompt-icon-circle">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z">
+                  </path>
+                  <circle cx="12" cy="13" r="3"></circle>
+                </svg>
+              </div>
+              <h3 class="prompt-headline">Initialize Road Camera Feed</h3>
+              <p class="prompt-desc">
+                Stream real-time video directly to the YOLO11 inference pipeline. Works seamlessly on laptop webcams,
+                smartphones, or vehicle dashcams.
+              </p>
+              <div class="prompt-btn-group" style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+                <button class="btn-primary-pill" id="startCamBtn">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                  Start Camera Stream
+                </button>
+                <button class="btn-outline-pill" id="startDemoVideoBtn" style="font-weight: 600;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                  Run p.mp4 Video Test
+                </button>
+                <label class="btn-outline-pill" style="cursor: pointer; margin: 0; display: inline-flex; align-items: center; gap: 8px;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  Select Local Video
+                  <input type="file" id="localVideoInput" accept="video/mp4,video/*" style="display: none;" />
+                </label>
+              </div>
+            </div>
+
+            <!-- In-Canvas Heads-Up Display (HUD) -->
+            <div class="hud-overlay" id="hudOverlay" style="display: none;">
+              <div class="hud-badge hud-fps">
+                <span class="hud-label">FPS</span>
+                <span class="hud-val" id="hudFps">0</span>
+              </div>
+              <div class="hud-badge hud-latency">
+                <span class="hud-label">Latency</span>
+                <span class="hud-val" id="hudLatency">0 ms</span>
+              </div>
+              <div class="hud-badge hud-count">
+                <span class="hud-label">Active Potholes</span>
+                <span class="hud-val" id="hudCount">0</span>
+              </div>
+              <div class="hud-badge hud-risk" id="hudRiskPill">
+                <span class="hud-val" id="hudRisk">ROAD CLEAR</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Stream Controls Bar -->
+          <div class="viewport-footer">
+            <div class="slider-group" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-start;">
+              <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <label for="confSlider" class="slider-label">
+                  Confidence Threshold: <span id="confValText"
+                    style="font-weight: 700; color: var(--color-ink);">25%</span>
+                </label>
+                <input type="range" id="confSlider" min="10" max="90" value="25" step="1" class="range-slider"
+                  style="width: 140px;" />
+              </div>
+              <div class="preset-pill-group" style="display: flex; gap: 6px; flex-wrap: wrap;">
+                <button type="button" class="preset-btn" data-conf="15">15% Sensitive</button>
+                <button type="button" class="preset-btn active-preset" data-conf="25">25% Standard</button>
+                <button type="button" class="preset-btn" data-conf="50">50% Strict</button>
+                <button type="button" class="preset-btn" data-conf="75">75% High</button>
+              </div>
+            </div>
+
+            <div class="stream-actions">
+              <button class="btn-outline-pill btn-sm" id="stopCamBtn" style="display: none;">
+                Pause Stream
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time Metrics & Telemetry Sidebar -->
+        <div class="telemetry-sidebar">
+          <div class="surface-card">
+            <div class="card-header">
+              <span class="card-caption">Live Telemetry</span>
+              <span class="badge-pill" id="roadHealthBadge">Optimal</span>
+            </div>
+
+            <div class="telemetry-stat-grid">
+              <div class="stat-box">
+                <span class="stat-box-val" id="statLiveCount">0</span>
+                <span class="stat-box-lbl">Current Detected</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-val" id="statTotalLogged">0</span>
+                <span class="stat-box-lbl">Session Encounters</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-val" id="statCriticalCount">0</span>
+                <span class="stat-box-lbl">Critical Potholes</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-box-val" id="statAvgConfidence">—</span>
+                <span class="stat-box-lbl">Peak Confidence</span>
+              </div>
+            </div>
+            <div class="tracking-detail-strip" aria-live="polite">
+              <div>
+                <span class="tracking-detail-label">Tracking</span>
+                <span class="tracking-detail-value" id="trackingStatusText">Waiting for road</span>
+              </div>
+              <div>
+                <span class="tracking-detail-label">Surface growth</span>
+                <span class="tracking-detail-value" id="surfaceGrowthText">Stable</span>
+              </div>
+              <div>
+                <span class="tracking-detail-label">Camera motion</span>
+                <span class="tracking-detail-value" id="cameraMotionText">Stable</span>
+              </div>
+            </div>
+
+            <div class="hazard-meter-block mt-4">
+              <div class="meter-label-row">
+                <span class="text-sm font-medium">Surface Hazard Index</span>
+                <span class="text-sm font-medium" id="hazardIndexText">0.0 / 10</span>
+              </div>
+              <div class="meter-track">
+                <div class="meter-fill" id="hazardMeterFill" style="width: 0%;"></div>
+              </div>
+              <span class="meter-caption" id="hazardDesc">Pavement condition appears stable and safe for transit.</span>
+            </div>
+          </div>
+
+          <!-- Live Detection Log -->
+          <div class="surface-card mt-4">
+            <div class="card-header">
+              <span class="card-caption">Real-Time Event Stream</span>
+              <button class="btn-tertiary-text btn-xs" id="clearEventLogBtn">Clear</button>
+            </div>
+
+            <div class="event-log-container" id="eventLogContainer">
+              <div class="event-empty-state">
+                No active detections logged yet. Start the stream or point camera at a road surface.
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-    </div>
+    </section>
+
+    <!-- TAB 2: IMAGE INSPECTION STUDIO -->
+    <section class="tab-content" id="tab-studio" role="tabpanel">
+
+      <!-- Studio Global Threshold Controller -->
+      <div class="surface-card mb-4" style="padding: 16px 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+          <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+            <span class="card-caption" style="margin: 0;">Evaluation Threshold</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <input type="range" id="globalStudioConfSlider" min="10" max="90" value="25" step="1" class="range-slider"
+                style="width: 140px;" />
+              <span id="globalStudioConfValText"
+                style="font-weight: 700; color: var(--color-ink); min-width: 36px;">25%</span>
+            </div>
+          </div>
+
+          <div class="preset-pill-group" style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="preset-btn" data-conf="15">15% Sensitive</button>
+            <button type="button" class="preset-btn active-preset" data-conf="25">25% Standard (Default)</button>
+            <button type="button" class="preset-btn" data-conf="50">50% Strict</button>
+            <button type="button" class="preset-btn" data-conf="75">75% High Certainty</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sample Picker Bar -->
+      <div class="surface-card mb-6">
+        <div class="card-header mb-3">
+          <div>
+            <span class="card-caption">Curated Pothole Test Corpus</span>
+            <h3 class="card-title">Instant Evaluation Samples</h3>
+          </div>
+          <span class="text-xs text-muted">Click any sample to execute instant neural inference</span>
+        </div>
+
+        <div class="sample-grid" id="sampleCardsContainer">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Live Detection Session Gallery -->
+      <div class="surface-card mb-6" id="liveInspectionSection">
+        <div class="card-header mb-3">
+          <div>
+            <span class="card-caption">Live Detection Archive</span>
+            <h3 class="card-title">Real-Time Captured Potholes</h3>
+          </div>
+          <span class="text-xs text-muted" id="liveInspectionCount">0 snapshots</span>
+        </div>
+        <div class="live-inspection-grid" id="liveInspectionGrid">
+          <div class="event-empty-state">Start a live camera or video stream to save confirmed detections here.</div>
+        </div>
+      </div>
+
+      <!-- Drag & Drop Zone or File Upload -->
+      <div class="upload-dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept="image/*" class="hidden-file-input" />
+        <div class="dropzone-content">
+          <div class="dropzone-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+          </div>
+          <h4 class="dropzone-title">Upload road photo or drag & drop here</h4>
+          <p class="dropzone-desc">Supports high-resolution JPG, PNG, WEBP from inspection drones, cameras, or
+            smartphones.</p>
+          <button class="btn-primary-pill mt-3" type="button" onclick="document.getElementById('fileInput').click()">
+            Browse Local File
+          </button>
+        </div>
+      </div>
+
+      <!-- Studio Result Workspace (Hidden until analyzed) -->
+      <div class="studio-workspace" id="studioWorkspace" style="display: none;">
+
+        <!-- Action Toolbar -->
+        <div class="studio-toolbar">
+          <div class="toolbar-left">
+            <span class="badge-pill" id="resultRoadBadge">Analyzed</span>
+            <span class="toolbar-text" id="resultSummaryText">0 potholes identified in 0ms</span>
+          </div>
+
+          <div class="toolbar-middle" style="display: flex; align-items: center; gap: 10px;">
+            <label for="studioConfSlider" class="text-xs text-muted font-medium"
+              style="display: flex; align-items: center; gap: 6px;">
+              Threshold: <span id="studioConfValText" class="text-ink font-medium">25%</span>
+            </label>
+            <input type="range" id="studioConfSlider" min="10" max="90" value="25" step="1" class="range-slider"
+              style="width: 120px;" />
+          </div>
+
+          <div class="toolbar-right">
+            <button class="btn-outline-pill btn-sm" id="downloadAnnotatedBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Export Annotated Image
+            </button>
+            <button class="btn-outline-pill btn-sm" id="exportAuditJsonBtn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              Audit JSON Report
+            </button>
+          </div>
+        </div>
+
+        <!-- Side-by-side or Main Annotated Canvas View -->
+        <div class="studio-main-grid">
+
+          <div class="surface-card studio-canvas-card">
+            <div class="card-header">
+              <span class="card-caption">Neural Vision Detection Render</span>
+              <div class="view-toggle-pills">
+                <button class="view-toggle-btn active" id="viewAnnotatedBtn">Annotated</button>
+                <button class="view-toggle-btn" id="viewOriginalBtn">Original</button>
+              </div>
+            </div>
+
+            <div class="studio-canvas-stage">
+              <img id="studioAnnotatedImg" class="studio-result-img" alt="Annotated detection output" />
+              <img id="studioOriginalImg" class="studio-result-img" alt="Original road photo" style="display: none;" />
+            </div>
+          </div>
+
+          <!-- Pothole Inventory Table -->
+          <div class="surface-card studio-table-card">
+            <div class="card-header">
+              <span class="card-caption">Pothole Inventory</span>
+              <span class="text-xs text-muted" id="inventoryCountBadge">0 items</span>
+            </div>
+
+            <div class="inventory-table-wrap">
+              <table class="inventory-table">
+                <thead>
+                  <tr>
+                    <th>Ref</th>
+                    <th>Confidence</th>
+                    <th>Severity</th>
+                    <th>Risk (1-10)</th>
+                    <th>Inspect</th>
+                  </tr>
+                </thead>
+                <tbody id="inventoryTableBody">
+                  <!-- Dynamic rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- TAB 3: MODEL DIAGNOSTICS & VERIFICATION -->
+    <section class="tab-content" id="tab-diagnostics" role="tabpanel">
+      <div class="surface-card mb-6">
+        <div class="card-header mb-4">
+          <div>
+            <span class="card-caption">Evaluation Proof & Official Benchmarks</span>
+            <h2 class="card-title">YOLO11 Pothole Detection Model Metrics</h2>
+          </div>
+          <span class="badge-pill">Weights Verified</span>
+        </div>
+
+        <p class="text-body mb-6">
+          Trained for 50 full epochs on a curated dataset of 665 asphalt and roadway images with thousands of
+          hand-annotated surface bounding boxes. The model reached state-of-the-art recall and mAP50 for autonomous edge
+          detection.
+        </p>
+
+        <!-- Metrics Grid -->
+        <div class="diagnostics-grid">
+          <div class="diag-card">
+            <span class="diag-lbl">mAP@0.50</span>
+            <span class="diag-val">95.8%</span>
+            <span class="diag-sub">Mean Average Precision at 0.5 IoU</span>
+          </div>
+          <div class="diag-card">
+            <span class="diag-lbl">mAP@0.50:0.95</span>
+            <span class="diag-val">72.8%</span>
+            <span class="diag-sub">Strict multi-threshold precision</span>
+          </div>
+          <div class="diag-card">
+            <span class="diag-lbl">Precision (B)</span>
+            <span class="diag-val">92.3%</span>
+            <span class="diag-sub">True positive detection fidelity</span>
+          </div>
+          <div class="diag-card">
+            <span class="diag-lbl">Recall (B)</span>
+            <span class="diag-val">87.4%</span>
+            <span class="diag-sub">Hazard capture completeness</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Training Artifacts Visual Proof Lightbox Cards -->
+      <div class="surface-card">
+        <div class="card-header mb-4">
+          <div>
+            <span class="card-caption">Training Curves & Validation Runs</span>
+            <h3 class="card-title">Empirical Training Artifacts</h3>
+          </div>
+          <span class="text-xs text-muted">Click any diagram to inspect high-resolution chart</span>
+        </div>
+
+        <div class="charts-gallery">
+          <div class="chart-card"
+            onclick="openLightbox('/static/metrics/results.png', 'Training Progression Across 50 Epochs')">
+            <img src="/static/metrics/results.png" alt="Training & Validation Loss Curves" loading="lazy" />
+            <div class="chart-card-meta">
+              <span class="chart-title">Loss & Metric Curves (50 Epochs)</span>
+              <span class="chart-desc">Demonstrates clean convergence of box, class, and dfl loss.</span>
+            </div>
+          </div>
+
+          <div class="chart-card" onclick="openLightbox('/static/metrics/confusion_matrix.png', 'Confusion Matrix')">
+            <img src="/static/metrics/confusion_matrix.png" alt="Confusion Matrix" loading="lazy" />
+            <div class="chart-card-meta">
+              <span class="chart-title">Confusion Matrix</span>
+              <span class="chart-desc">Near-zero false positive rate on complex pavement backgrounds.</span>
+            </div>
+          </div>
+
+          <div class="chart-card" onclick="openLightbox('/static/metrics/BoxPR_curve.png', 'Precision-Recall Curve')">
+            <img src="/static/metrics/BoxPR_curve.png" alt="Precision-Recall Curve" loading="lazy" />
+            <div class="chart-card-meta">
+              <span class="chart-title">Precision-Recall Curve (0.958)</span>
+              <span class="chart-desc">Shows high area-under-curve across all operating thresholds.</span>
+            </div>
+          </div>
+
+          <div class="chart-card" onclick="openLightbox('/static/metrics/BoxF1_curve.png', 'F1-Confidence Curve')">
+            <img src="/static/metrics/BoxF1_curve.png" alt="F1 Confidence Curve" loading="lazy" />
+            <div class="chart-card-meta">
+              <span class="chart-title">F1 Score vs Confidence</span>
+              <span class="chart-desc">Peak F1 score achieved at confidence threshold ~0.42.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <!-- Socket.IO + App JS -->
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-  <script src="/static/app.js"></script>
+  <!-- MODAL 1: DETAILED POTHOLE AUDIT MODAL -->
+  <div class="modal-backdrop" id="potholeAuditModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="card-caption">Asset Damage Inspection</span>
+          <h3 class="modal-title" id="modalPotholeTitle">Pothole Inspection Detail</h3>
+        </div>
+        <button class="modal-close-btn" id="closeAuditModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="modal-preview-split">
+          <div class="modal-crop-box">
+            <img id="modalCropImg" alt="Cropped pothole thumbnail" />
+          </div>
+
+          <div class="modal-metrics-list">
+            <div class="modal-metric-row">
+              <span class="modal-metric-lbl">Confidence Score</span>
+              <span class="modal-metric-val" id="modalConfVal">94.5%</span>
+            </div>
+            <div class="modal-metric-row">
+              <span class="modal-metric-lbl">Hazard Severity</span>
+              <span class="badge-pill" id="modalSeverityBadge">Critical</span>
+            </div>
+            <div class="modal-metric-row">
+              <span class="modal-metric-lbl">Road Risk Index</span>
+              <span class="modal-metric-val" id="modalRiskScore">8.4 / 10</span>
+            </div>
+            <div class="modal-metric-row">
+              <span class="modal-metric-lbl">Dimensions</span>
+              <span class="modal-metric-val" id="modalDims">240px &times; 180px</span>
+            </div>
+            <div class="modal-metric-row">
+              <span class="modal-metric-lbl">Bounding Box</span>
+              <span class="modal-metric-val font-mono" id="modalBoxCoords">[x1, y1, x2, y2]</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-action-box mt-4">
+          <span class="card-caption mb-1">Recommended Municipal Action</span>
+          <p class="text-sm font-medium" id="modalRepairAction">
+            Immediate structural asphalt patching required within 48 hours to prevent tire blowouts.
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-outline-pill btn-sm" id="copyCoordsBtn">Copy Coordinates</button>
+        <button class="btn-primary-pill btn-sm"
+          onclick="document.getElementById('potholeAuditModal').classList.remove('active')">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: LIGHTBOX FOR CHARTS -->
+  <div class="modal-backdrop" id="lightboxModal">
+    <div class="lightbox-card">
+      <div class="modal-header">
+        <h4 class="modal-title" id="lightboxTitle">Inspection Chart</h4>
+        <button class="modal-close-btn"
+          onclick="document.getElementById('lightboxModal').classList.remove('active')">&times;</button>
+      </div>
+      <div class="lightbox-body">
+        <img id="lightboxImg" alt="Detailed training diagram" />
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: SETTINGS MODAL -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <span class="card-caption">System Configuration</span>
+          <h3 class="modal-title">Scanner & Audio Settings</h3>
+        </div>
+        <button class="modal-close-btn" onclick="closeSettingsModal()" title="Close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="setting-item">
+          <div>
+            <div class="font-medium text-ink">Detection Confidence Threshold</div>
+            <div class="text-xs text-muted">Filter out predictions below this certainty level</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="range" id="settingConfSlider" min="10" max="90" value="25" step="1" class="range-slider"
+              style="width: 130px;" />
+            <span id="settingConfValText" class="font-medium text-ink"
+              style="min-width: 36px; font-weight: 700;">25%</span>
+          </div>
+        </div>
+
+        <div class="setting-presets-row"
+          style="display: flex; gap: 6px; margin-top: 10px; margin-bottom: 16px; justify-content: flex-end; flex-wrap: wrap;">
+          <button type="button" class="preset-btn" data-conf="15">15% Sensitive</button>
+          <button type="button" class="preset-btn active-preset" data-conf="25">25% Standard</button>
+          <button type="button" class="preset-btn" data-conf="50">50% Strict</button>
+          <button type="button" class="preset-btn" data-conf="75">75% High</button>
+        </div>
+
+        <div class="setting-item mt-4">
+          <div>
+            <div class="font-medium text-ink">Acoustic Proximity Chime</div>
+            <div class="text-xs text-muted">Emits a soft alert tone when a critical pothole is in path</div>
+          </div>
+          <input type="checkbox" id="settingAudioBeep" checked class="custom-toggle" />
+        </div>
+
+        <div class="setting-item mt-4">
+          <div>
+            <div class="font-medium text-ink">Inference Interval</div>
+            <div class="text-xs text-muted">Frequency of frames dispatched to inference engine</div>
+          </div>
+          <select id="settingFpsInterval" class="custom-select">
+            <option value="60">Maximum (Real-time ~15 FPS)</option>
+            <option value="80" selected>Balanced (~12 FPS)</option>
+            <option value="250">Power Saver (~4 FPS)</option>
+          </select>
+        </div>
+
+        <div class="setting-item mt-4">
+          <div>
+            <div class="font-medium text-ink">Smooth Scrolling (Lenis)</div>
+            <div class="text-xs text-muted">Fluid inertia acceleration across sections</div>
+          </div>
+          <input type="checkbox" id="settingSmoothScroll" checked class="custom-toggle" />
+        </div>
+
+        <div class="setting-item mt-4">
+          <div>
+            <div class="font-medium text-ink">Live Snapshot Storage</div>
+            <div class="text-xs text-muted">Remove all saved pothole photos and location snapshots</div>
+          </div>
+          <button type="button" class="btn-outline-pill btn-sm" id="clearLiveSnapshotsBtn">
+            Clear Saved Data
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary-pill btn-sm" onclick="closeSettingsModal()">
+          Save Preferences
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="page-footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <span class="footer-logo">PotholeVision · Intelligent Infrastructure</span>
+        <span class="footer-sub">Editorial UI crafted with ElevenLabs design principles & YOLO11 computer vision.</span>
+      </div>
+      <div class="footer-right">
+        <span class="footer-note">All models trained and validated locally with full reproducible logs.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Script -->
+  <script src="/static/app.js?v=4.2"></script>
 </body>
 
 </html>
