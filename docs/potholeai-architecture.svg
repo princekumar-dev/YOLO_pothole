@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <rect width="1600" height="900" fill="#f5f5f5"/>
+
+  <g opacity="0.42">
+    <circle cx="210" cy="80" r="210" fill="#a7e5d3"/>
+    <circle cx="1430" cy="160" r="230" fill="#f4c5a8"/>
+    <circle cx="320" cy="820" r="180" fill="#c8b8e0"/>
+    <circle cx="1320" cy="780" r="210" fill="#a8c8e8"/>
+  </g>
+
+  <g fill="none" stroke="#d6d3d1" stroke-width="1">
+    <path d="M0 150H1600M0 300H1600M0 450H1600M0 600H1600M0 750H1600"/>
+    <path d="M200 0V900M400 0V900M600 0V900M800 0V900M1000 0V900M1200 0V900M1400 0V900"/>
+  </g>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="64" y="52" width="1472" height="80" rx="18" fill="#ffffff" stroke="#e7e5e4"/>
+    <g transform="translate(88 74)">
+      <rect width="36" height="36" rx="18" fill="#292524"/>
+      <path d="M18 8l-10 5 10 5 10-5-10-5zm-10 15 10 5 10-5M8 18l10 5 10-5"
+            fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="136" y="96" fill="#0c0a09" font-size="24" font-weight="700">PotholeVision</text>
+    <text x="299" y="96" fill="#777169" font-size="18">System Architecture</text>
+    <rect x="1234" y="76" width="278" height="34" rx="17" fill="#f0efed"/>
+    <circle cx="1256" cy="93" r="5" fill="#16a34a"/>
+    <text x="1270" y="99" fill="#292524" font-size="15" font-weight="650">YOLO11n Detection Pipeline</text>
+
+    <text x="64" y="178" fill="#777169" font-size="13" font-weight="700" letter-spacing="2">INPUT LAYER</text>
+    <text x="392" y="178" fill="#777169" font-size="13" font-weight="700" letter-spacing="2">WEB PROCESSING</text>
+    <text x="740" y="178" fill="#777169" font-size="13" font-weight="700" letter-spacing="2">INFERENCE ENGINE</text>
+    <text x="1088" y="178" fill="#777169" font-size="13" font-weight="700" letter-spacing="2">OUTPUT &amp; STORAGE</text>
+
+    <g>
+      <rect x="64" y="198" width="280" height="118" rx="16" fill="#ffffff" stroke="#e7e5e4"/>
+      <rect x="64" y="198" width="280" height="42" rx="16" fill="#292524"/>
+      <rect x="64" y="224" width="280" height="16" fill="#292524"/>
+      <text x="86" y="225" fill="#ffffff" font-size="15" font-weight="700">Live Camera</text>
+      <circle cx="318" cy="219" r="6" fill="#16a34a"/>
+      <text x="86" y="270" fill="#292524" font-size="17" font-weight="700">Phone / Laptop</text>
+      <text x="86" y="294" fill="#777169" font-size="13">getUserMedia frames</text>
+
+      <rect x="64" y="334" width="280" height="118" rx="16" fill="#ffffff" stroke="#e7e5e4"/>
+      <rect x="64" y="334" width="280" height="42" rx="16" fill="#292524"/>
+      <rect x="64" y="360" width="280" height="16" fill="#292524"/>
+      <text x="86" y="361" fill="#ffffff" font-size="15" font-weight="700">Demo / Local Video</text>
+      <text x="86" y="406" fill="#292524" font-size="17" font-weight="700">MP4 or Local File</text>
+      <text x="86" y="430" fill="#777169" font-size="13">Video frame sampling</text>
+
+      <rect x="64" y="470" width="280" height="118" rx="16" fill="#ffffff" stroke="#e7e5e4"/>
+      <rect x="64" y="470" width="280" height="42" rx="16" fill="#292524"/>
+      <rect x="64" y="496" width="280" height="16" fill="#292524"/>
+      <text x="86" y="497" fill="#ffffff" font-size="15" font-weight="700">Image Studio</text>
+      <text x="86" y="542" fill="#292524" font-size="17" font-weight="700">JPG / PNG / WEBP</text>
+      <text x="86" y="566" fill="#777169" font-size="13">Upload or curated sample</text>
+
+      <rect x="64" y="606" width="280" height="118" rx="16" fill="#292524"/>
+      <text x="86" y="642" fill="#a8a29e" font-size="12" font-weight="700" letter-spacing="1.5">FRAME SETTINGS</text>
+      <text x="86" y="675" fill="#ffffff" font-size="17" font-weight="700">Confidence · IoU · FPS</text>
+      <text x="86" y="701" fill="#d6d3d1" font-size="13">User-tunable inference controls</text>
+    </g>
+
+    <g>
+      <rect x="392" y="198" width="300" height="118" rx="16" fill="#ffffff" stroke="#e7e5e4"/>
+      <text x="414" y="225" fill="#777169" font-size="12" font-weight="700" letter-spacing="1.5">BROWSER CONTROLLER</text>
+      <text x="414" y="258" fill="#292524" font-size="18" font-weight="700">Canvas Capture</text>
+      <text x="414" y="282" fill="#777169" font-size="13">Frame resize · JPEG encode</text>
+      <rect x="414" y="300" width="256" height="2" fill="#f0efed"/>
+
+      <rect x="392" y="334" width="300" height="118" rx="16" fill="#ffffff" stroke="#e7e5e4"/>
+      <text x="414" y="361" fill="#777169" font-size="12" font-weight="700" letter-spacing="1.5">REAL-TIME LINK</text>
+      <text x="414" y="394" fill="#292524" font-size="18" font-weight="700">Socket.IO / REST</text>
+      <text x="414" y="418" fill="#777169" font-size="13">Frame delivery · JSON response</text>
+
+      <rect x="392" y="470" width="300" height="118" rx="16" fill="#ffffff" stroke="#e7e5e4"/>
+      <text x="414" y="497" fill="#777169" font-size="12" font-weight="700" letter-spacing="1.5">TRACKING LOOP</text>
+      <text x="414" y="530" fill="#292524" font-size="18" font-weight="700">Centroid + IoU</text>
+      <text x="414" y="554" fill="#777169" font-size="13">Velocity · smoothing · shake compensation</text>
+
+      <rect x="392" y="606" width="300" height="118" rx="16" fill="#292524"/>
+      <text x="414" y="642" fill="#a8a29e" font-size="12" font-weight="700" letter-spacing="1.5">FRAME RENDER</text>
+      <text x="414" y="675" fill="#ffffff" font-size="18" font-weight="700">HTML Canvas Overlay</text>
+      <text x="414" y="701" fill="#d6d3d1" font-size="13">Smooth predicted bounding boxes</text>
+    </g>
+
+    <g>
+      <rect x="740" y="198" width="300" height="526" rx="20" fill="#292524"/>
+      <rect x="762" y="220" width="256" height="38" rx="19" fill="#1c1917" stroke="#44403c"/>
+      <circle cx="784" cy="239" r="6" fill="#16a34a"/>
+      <text x="798" y="245" fill="#ffffff" font-size="14" font-weight="700">YOLO11n Model Ready</text>
+
+      <text x="762" y="296" fill="#a8a29e" font-size="12" font-weight="700" letter-spacing="1.5">ULTRALYTICS INFERENCE</text>
+      <text x="762" y="334" fill="#ffffff" font-size="24" font-weight="700">Pothole Detection</text>
+      <text x="762" y="360" fill="#d6d3d1" font-size="14">640px live inference</text>
+      <text x="762" y="382" fill="#d6d3d1" font-size="14">960px inspection inference</text>
+
+      <rect x="762" y="410" width="256" height="86" rx="14" fill="#1c1917" stroke="#44403c"/>
+      <text x="784" y="438" fill="#a8a29e" font-size="12" font-weight="700">POST-PROCESSING</text>
+      <text x="784" y="466" fill="#ffffff" font-size="15" font-weight="700">NMS · confidence · IoU</text>
+      <text x="784" y="486" fill="#d6d3d1" font-size="12">Maximum 50 detections</text>
+
+      <rect x="762" y="514" width="256" height="86" rx="14" fill="#1c1917" stroke="#44403c"/>
+      <text x="784" y="542" fill="#a8a29e" font-size="12" font-weight="700">SEVERITY ANALYSIS</text>
+      <text x="784" y="570" fill="#ffffff" font-size="15" font-weight="700">Area · confidence · risk</text>
+      <text x="784" y="590" fill="#d6d3d1" font-size="12">Minor · Moderate · Critical</text>
+
+      <rect x="762" y="618" width="256" height="82" rx="14" fill="#16a34a"/>
+      <text x="784" y="646" fill="#dff8ee" font-size="12" font-weight="700">DETECTION RESULT</text>
+      <text x="784" y="676" fill="#ffffff" font-size="18" font-weight="700">Boxes · scores · crops</text>
+    </g>
+
+    <g>
+      <rect x="1088" y="198" width="448" height="118" rx="16" fill="#ffffff" stroke="#e7e5e4"/>
+      <text x="1110" y="225" fill="#777169" font-size="12" font-weight="700" letter-spacing="1.5">LIVE TELEMETRY</text>
+      <text x="1110" y="258" fill="#292524" font-size="18" font-weight="700">Counts · FPS · latency · hazard</text>
+      <text x="1110" y="282" fill="#777169" font-size="13">Road status · growth · camera motion</text>
+
+      <rect x="1088" y="334" width="216" height="118" rx="16" fill="#ffffff" stroke="#e7e5e4"/>
+      <text x="1110" y="361" fill="#777169" font-size="12" font-weight="700" letter-spacing="1.5">LIVE ARCHIVE</text>
+      <text x="1110" y="394" fill="#292524" font-size="18" font-weight="700">Snapshot Gallery</text>
+      <text x="1110" y="418" fill="#777169" font-size="13">Crop · time · location</text>
+
+      <rect x="1320" y="334" width="216" height="118" rx="16" fill="#ffffff" stroke="#e7e5e4"/>
+      <text x="1342" y="361" fill="#777169" font-size="12" font-weight="700" letter-spacing="1.5">INSPECTION</text>
+      <text x="1342" y="394" fill="#292524" font-size="18" font-weight="700">Pothole Inventory</text>
+      <text x="1342" y="418" fill="#777169" font-size="13">Detail · repair · coordinates</text>
+
+      <rect x="1088" y="470" width="216" height="118" rx="16" fill="#292524"/>
+      <text x="1110" y="497" fill="#a8a29e" font-size="12" font-weight="700" letter-spacing="1.5">JPG EXPORT</text>
+      <text x="1110" y="530" fill="#ffffff" font-size="18" font-weight="700">Annotated Image</text>
+      <text x="1110" y="554" fill="#d6d3d1" font-size="13">Download audit artifact</text>
+
+      <rect x="1320" y="470" width="216" height="118" rx="16" fill="#292524"/>
+      <text x="1342" y="497" fill="#a8a29e" font-size="12" font-weight="700" letter-spacing="1.5">JSON EXPORT</text>
+      <text x="1342" y="530" fill="#ffffff" font-size="18" font-weight="700">Audit Report</text>
+      <text x="1342" y="554" fill="#d6d3d1" font-size="13">Metrics · boxes · actions</text>
+
+      <rect x="1088" y="606" width="448" height="118" rx="16" fill="#ffffff" stroke="#e7e5e4"/>
+      <text x="1110" y="633" fill="#777169" font-size="12" font-weight="700" letter-spacing="1.5">SESSION MEMORY</text>
+      <text x="1110" y="666" fill="#292524" font-size="18" font-weight="700">Session Storage</text>
+      <text x="1110" y="690" fill="#777169" font-size="13">Saved snapshots · clear-data control · browser-only archive</text>
+    </g>
+
+    <g fill="#d6d3d1" stroke="#292524" stroke-width="2" marker-end="url(#arrow)">
+      <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+          <path d="M0,0 L0,6 L9,3 z" fill="#292524" stroke="none"/>
+        </marker>
+      </defs>
+      <path d="M344 257H392"/>
+      <path d="M344 393H392"/>
+      <path d="M344 529H392"/>
+      <path d="M692 257H740"/>
+      <path d="M692 393H740"/>
+      <path d="M692 529H740"/>
+      <path d="M1040 257H1088"/>
+      <path d="M1040 393H1088"/>
+      <path d="M1040 529H1088"/>
+    </g>
+
+    <text x="64" y="778" fill="#777169" font-size="13">Flask + Flask-SocketIO</text>
+    <text x="64" y="802" fill="#292524" font-size="16" font-weight="700">PotholeAI · End-to-end architecture</text>
+  </g>
+</svg>
