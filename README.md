@@ -13,6 +13,22 @@
 
 PotholeAI combines a fine-tuned YOLO11n pothole detector with live camera and video tracking, mobile-first inspection tools, severity grading, snapshot archives, GPS metadata, and downloadable reports.
 
+## System architecture
+
+<p align="center">
+  <img src="./docs/potholeai-architecture.png" alt="PotholeAI system architecture diagram" width="100%">
+</p>
+
+[View editable architecture SVG](./docs/potholeai-architecture.svg)
+
+## Application workflow
+
+<p align="center">
+  <img src="./docs/potholeai-workflow.png" alt="PotholeAI application workflow diagram" width="100%">
+</p>
+
+[View editable workflow SVG](./docs/potholeai-workflow.svg)
+
 ## Features
 
 ### Live road scanner
